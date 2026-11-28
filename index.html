@@ -230,6 +230,16 @@ link.href=url.href;
 function show(){if(!ready||dialog.open||shown||typeof dialog.showModal!=='function')return;dialog.showModal();shown=true;try{sessionStorage.setItem('fr_exit_seen','1')}catch(e){}}
 setTimeout(function(){ready=true},120000);
 document.addEventListener('mouseout',function(e){if(!e.relatedTarget&&e.clientY<=0&&matchMedia('(pointer:fine)').matches)show()});
+// Mobile exit-intent heuristic: rapid upward scroll toward page top.
+if(matchMedia('(pointer:coarse)').matches){
+let previousY=Math.max(0,window.scrollY), previousTime=performance.now(), upward=0;
+window.addEventListener('scroll',function(){
+const y=Math.max(0,window.scrollY), now=performance.now(), delta=previousY-y, elapsed=now-previousTime;
+if(delta>0 && elapsed<250){upward+=delta;}else{upward=0;}
+if(ready && upward>=120 && y<=80 && !document.hidden && !document.fullscreenElement && !document.webkitFullscreenElement){show();upward=0;}
+previousY=y;previousTime=now;
+},{passive:true});
+}
 document.getElementById('fr-exit-close').addEventListener('click',function(){dialog.close()});
 link.addEventListener('click',function(){if(typeof fbq==='function')fbq('trackCustom','ExitOfferClick',{source:'gelatina_fr'})});
 })();
