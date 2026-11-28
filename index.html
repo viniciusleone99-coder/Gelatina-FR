@@ -212,10 +212,7 @@
 #fr-exit p{line-height:1.5;margin-bottom:20px}
 #fr-exit a{display:block;background:#16743c;color:white;padding:16px;border-radius:10px;text-decoration:none;font-weight:bold}
 #fr-exit button{background:none;border:0;padding:16px;color:#555;cursor:pointer;text-decoration:underline}
-#fr-offer-shortcut{margin:12px auto;background:none;border:0;text-decoration:underline;color:#555;padding:10px;cursor:pointer}
-#fr-offer-shortcut[hidden]{display:none}
 </style>
-<button id="fr-offer-shortcut" hidden type="button">Vous préférez accéder directement à l’offre ?</button>
 <dialog id="fr-exit" aria-labelledby="fr-exit-title">
 <h2 id="fr-exit-title">Vous trouvez la vidéo trop longue ?</h2>
 <p>Vous pouvez accéder directement à notre offre sans regarder la vidéo jusqu’à la fin.</p>
@@ -224,16 +221,15 @@
 </dialog>
 <script>
 (function(){
-const dialog=document.getElementById('fr-exit'), shortcut=document.getElementById('fr-offer-shortcut'), link=document.getElementById('fr-exit-link');
+const dialog=document.getElementById('fr-exit'), link=document.getElementById('fr-exit-link');
 let ready=false, shown=false;
 try{shown=sessionStorage.getItem('fr_exit_seen')==='1'}catch(e){}
 const url=new URL(link.href);
 for(const [k,v] of new URLSearchParams(location.search)){if(/^utm_/i.test(k)||/^(fbclid|gclid|ttclid|src|sck)$/i.test(k))url.searchParams.set(k,v)}
 link.href=url.href;
-function show(manual){if(!ready||dialog.open||(!manual&&shown)||typeof dialog.showModal!=='function')return;dialog.showModal();shown=true;try{sessionStorage.setItem('fr_exit_seen','1')}catch(e){}}
-setTimeout(function(){ready=true;shortcut.hidden=false},120000);
-document.addEventListener('mouseout',function(e){if(!e.relatedTarget&&e.clientY<=0&&matchMedia('(pointer:fine)').matches)show(false)});
-shortcut.addEventListener('click',function(){show(true)});
+function show(){if(!ready||dialog.open||shown||typeof dialog.showModal!=='function')return;dialog.showModal();shown=true;try{sessionStorage.setItem('fr_exit_seen','1')}catch(e){}}
+setTimeout(function(){ready=true},120000);
+document.addEventListener('mouseout',function(e){if(!e.relatedTarget&&e.clientY<=0&&matchMedia('(pointer:fine)').matches)show()});
 document.getElementById('fr-exit-close').addEventListener('click',function(){dialog.close()});
 link.addEventListener('click',function(){if(typeof fbq==='function')fbq('trackCustom','ExitOfferClick',{source:'gelatina_fr'})});
 })();
