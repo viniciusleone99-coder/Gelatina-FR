@@ -229,7 +229,14 @@ for(const [k,v] of new URLSearchParams(location.search)){if(/^utm_/i.test(k)||/^
 link.href=url.href;
 function show(){if(!ready||dialog.open||shown||typeof dialog.showModal!=='function')return;dialog.showModal();shown=true;try{sessionStorage.setItem('fr_exit_seen','1')}catch(e){}}
 setTimeout(function(){ready=true},120000);
-document.addEventListener('mouseout',function(e){if(!e.relatedTarget&&e.clientY<=0&&matchMedia('(pointer:fine)').matches)show()});
+// Desktop: detect upward cursor movement near the browser chrome.
+let lastMouseY=null;
+document.addEventListener('mousemove',function(e){
+if(e.clientY<=25 && lastMouseY!==null && e.clientY<lastMouseY)show();
+lastMouseY=e.clientY;
+},true);
+document.addEventListener('mouseout',function(e){if(!e.relatedTarget&&e.clientY<=25)show()},true);
+document.documentElement.addEventListener('mouseleave',function(e){if(e.clientY<=25)show()});
 // Mobile exit-intent heuristic: rapid upward scroll toward page top.
 if(matchMedia('(pointer:coarse)').matches){
 let previousY=Math.max(0,window.scrollY), previousTime=performance.now(), upward=0;
